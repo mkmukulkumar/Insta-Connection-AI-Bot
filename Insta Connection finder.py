@@ -2,15 +2,21 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import random
+import re 
 
-username=""                 #Use Yours
-password=""                 #Use Yours
 
-visited = []
-queue = []
+username=input("Insta user ID ")
+src=username
+target=input("Enter to whom you want to connect ")
+webdriverpath=input("Webdriver path ")
+width=int(input("Give width of tree"))
+maxDepth=int(input("Give depth of tree"))
+password=input("Insta Password ")
 
-visited.append(username)
-queue.append(username)
+
+
+
+
                                         #OPEN INSTAGRAM
 driver = webdriver.Chrome("D:\software\chrome driver\chromedriver.exe")# Optional argument, if not specified will search path.
 driver.maximize_window()  
@@ -22,52 +28,35 @@ element.send_keys(username)
 element=driver.find_element_by_xpath("/html/body/div[1]/section/main/article/div[2]/div[1]/div/form/div/div[2]/div/label/input")
 element.send_keys(password)
 element.send_keys(Keys.RETURN)
-# element=driver.find_element_by_xpath("//button[contains(text(),'Not Now')]")
-# element.click()
-                                        #REACHING PROFILE
-time.sleep(3)
-element=driver.find_element_by_xpath("/html/body/div[1]/section/nav/div[2]/div/div/div[3]/div/div[5]/span/img") #to open option to profile my image
-element.click()
-time.sleep(1)
-element=driver.find_element_by_link_text("Profile")
-element.click()
-j=0
-                                        #BFS
-while (j<3):
-    s = queue.pop(0) 
-    print (s, end = " ")
-    driver.get('https://www.instagram.com/'+s) 
+
+    
+
+
+def DLS(src,target,maxDepth,width):    
+    if src == target : 
+        print("path"+src)
+        return True 
+    if maxDepth <= 0 : return False 
+    i=1
     time.sleep(2)
-    element=driver.find_element_by_xpath("/html/body/div[1]/section/main/div/header/section/ul/li[3]/a")  #following button
-    element.click()
-    time.sleep(2)
-    scroll_box = driver.find_element_by_xpath("/html/body/div[4]/div/div/div[2]")      #following list
-    last_ht, ht = 0, 1
-    while last_ht != ht:
-        last_ht = ht
-        time.sleep(1.3)
-        ht = driver.execute_script("""
-            arguments[0].scrollTo(0, arguments[0].scrollHeight); 
-            return arguments[0].scrollHeight;
-            """, scroll_box)
-    links = scroll_box.find_elements_by_tag_name('a')
-    names = [name.text for name in links if name.text != '']
-    # i=0
-    # while(i<390):  
-    #     print(names[i])
-    #     i=i+1
-    random.shuffle(names)
-    for neighbour in names:   
-        if neighbour not in visited: 
-            visited.append(neighbour)
-            queue.append(neighbour)
-
-
-                           
-
-
-
-
-
-
-
+    while(i<=width):
+        time.sleep(3)
+        driver.get('https://www.instagram.com/'+src)
+        time.sleep(3)
+        pvt = driver.page_source
+        pvtfound = re.search(r'This Account is Private', pvt)
+        if(pvtfound == None) : #if true means private         
+            element=driver.find_element_by_xpath("/html/body/div[1]/section/main/div/header/section/ul/li[3]/a")  #following button
+            element.click() #following button
+            time.sleep(3)
+            person =driver.find_element_by_xpath("/html/body/div[4]/div/div/div[2]/ul/div/li["+str(i)+"]/div/div[2]/div[1]/div/div/span/a").text
+            time.sleep(3)
+            print(person)
+            if(DLS(person,target,maxDepth-1,width)): 
+                print("path"+person)
+                return True
+        else:    
+            return False
+        i=i+1    
+    return False    
+DLS(src,target,maxDepth,width)
