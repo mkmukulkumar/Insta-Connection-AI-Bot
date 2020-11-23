@@ -15,4 +15,4 @@ Instagram is among one of the most used social networking  sites. It offers many
 - Path of chrome webdriver
 ### HOW TO RUN
 Run with Python IDLE or 
-To Run on Command prompt use py -i Insta Connection finer.py on folder's directory
+To Run on Command prompt use py -i Insta Connection finder.py on folder's directory
